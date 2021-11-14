@@ -2,26 +2,34 @@ package com.upt.cti.smartwallet;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView message, month;
+    TextView message;
     EditText income, expenses;
-    Button bUpdate, bSearch;
+    Button bUpdate;
+    Spinner spinner;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -33,32 +41,36 @@ public class MainActivity extends AppCompatActivity {
         income = findViewById(R.id.income);
         expenses = findViewById(R.id.expenses);
         bUpdate = findViewById(R.id.bUpdate);
-        month = findViewById(R.id.month);
-        bSearch = findViewById(R.id.bSearch);
+        spinner = findViewById(R.id.spinner);
 
+        List<String> monthNames = new ArrayList<>();
+        List<MonthlyExpenses> monthlyExpensesList = new ArrayList<>();
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("calendar").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    MonthlyExpenses monthlyExpenses = childSnapshot.getValue(MonthlyExpenses.class);
+                    monthNames.add(monthlyExpenses.getMonth());
+                    monthlyExpensesList.add(monthlyExpenses);
+                }
+                ArrayAdapter<String> sAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, monthNames);
+                sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(sAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void clicked(View view) {
         switch (view.getId()) {
-            case R.id.bSearch:
-                DocumentReference docRef = db.collection("calendar").document(month.getText().toString());
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                MonthlyExpenses monthlyExpense = document.toObject(MonthlyExpenses.class);
-                                message.setText(monthlyExpense.getMonth() + " was found");
-                            } else {
-                                message.setText("Couldn't be found");
-                            }
-                        }
-                    }
-                });
-                break;
             case R.id.bUpdate:
-                DocumentReference monthReference = db.collection("calendar").document(month.getText().toString());
+                DocumentReference monthReference = db.collection("calendar").document(spinner.getSelectedItem().toString());
                 Integer updatedIncome = Integer.parseInt(income.getText().toString());
                 Integer updatedExpenses = Integer.parseInt(expenses.getText().toString());
 
@@ -70,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                message.setText(month.getText().toString() + " was updated");
+                                message.setText(spinner.getSelectedItem().toString() + " was updated");
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
