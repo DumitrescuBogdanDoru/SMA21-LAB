@@ -14,6 +14,10 @@ public class Payment {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getName() {
         return name;
     }

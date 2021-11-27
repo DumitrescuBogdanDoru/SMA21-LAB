@@ -58,6 +58,8 @@ public class Payments extends AppCompatActivity {
                     if (!snapshots.isEmpty()) {
                         for (DocumentSnapshot documentSnapshot : snapshots) {
                             Payment payment = documentSnapshot.toObject(Payment.class);
+                            String timestamp = documentSnapshot.toString();
+                            payment.setTimestamp(timestamp.substring(28,47));
                             payments.add(payment);
                             tStatus.setText("Payments were found");
                         }
