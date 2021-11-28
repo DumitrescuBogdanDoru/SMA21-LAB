@@ -55,8 +55,8 @@ public class PaymentAdapter extends ArrayAdapter<Payment> {
         itemHolder.lHeader.setBackgroundColor(PaymentType.getColorFromPaymentType(pItem.getType()));
         itemHolder.tCost.setText(pItem.getCost() + " LEI");
         itemHolder.tType.setText(pItem.getType());
-        itemHolder.tDate.setText("Date: " + pItem.timestamp.substring(0, 10));
-        itemHolder.tTime.setText("Time: " + pItem.timestamp.substring(11));
+        itemHolder.tDate.setText("Date: " + pItem.getTimestamp().substring(0, 10));
+        itemHolder.tTime.setText("Time: " + pItem.getTimestamp().substring(11));
 
         return view;
     }

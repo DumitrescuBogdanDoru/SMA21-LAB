@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,7 +51,7 @@ public class Payments extends AppCompatActivity {
         final PaymentAdapter adapter = new PaymentAdapter(this, R.layout.item_payment, payments);
         listPayments.setAdapter(adapter);
 
-        CollectionReference documentReference = db.collection("wallet");
+        CollectionReference documentReference = db.collection("wallet2");
         documentReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -58,8 +60,8 @@ public class Payments extends AppCompatActivity {
                     if (!snapshots.isEmpty()) {
                         for (DocumentSnapshot documentSnapshot : snapshots) {
                             Payment payment = documentSnapshot.toObject(Payment.class);
-                            String timestamp = documentSnapshot.toString();
-                            payment.setTimestamp(timestamp.substring(28,47));
+                            String id = documentSnapshot.getId();
+                            payment.setId(Integer.parseInt(id));
                             payments.add(payment);
                             tStatus.setText("Payments were found");
                         }
@@ -69,9 +71,23 @@ public class Payments extends AppCompatActivity {
                 }
             }
         });
+
+        listPayments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                AppState.get().setDatabaseReference(db);
+                AppState.get().setCurrentPayment(payments.get(i));
+                startActivity(new Intent(getApplicationContext(), AddPaymentActivity.class));
+            }
+        });
+
+
     }
 
     public void clicked(View view) {
-
+        switch (view.getId()) {
+            case R.id.fabAdd:
+                startActivity(new Intent(getApplicationContext(), AddPaymentActivity.class));
+        }
     }
 }
