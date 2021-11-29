@@ -2,10 +2,6 @@ package com.upt.cti.smartwallet;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -22,16 +20,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Transaction;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +44,8 @@ public class AddPaymentActivity extends AppCompatActivity {
         // firestore configuration for offline persistance
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(true)
-                .build();;
+                .build();
+        ;
         db.setFirestoreSettings(settings);
 
 
@@ -88,7 +82,7 @@ public class AddPaymentActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (payment != null){
+                if (payment != null) {
                     final DocumentReference docRef = db.collection("wallet2").document(payment.getId().toString());
                     String name = eName.getText().toString();
                     double cost = Double.parseDouble(eCost.getText().toString());
@@ -100,20 +94,19 @@ public class AddPaymentActivity extends AppCompatActivity {
                             "type", type,
                             "timestamp", getCurrentTimeDate()
                     )
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            tTimestamp.setText("Payment updated");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            tTimestamp.setText("Update failed");
-                        }
-                    });
-                }
-                else {
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    tTimestamp.setText("Payment updated");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    tTimestamp.setText("Update failed");
+                                }
+                            });
+                } else {
                     CollectionReference documentReference = db.collection("wallet2");
                     documentReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
