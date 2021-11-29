@@ -1,3 +1,3 @@
 # SMA21-LAB
-SMA 2021 - Laborator 6
+SMA 2021 - Laborator 9
 Dumitrescu Bogdan-Doru
