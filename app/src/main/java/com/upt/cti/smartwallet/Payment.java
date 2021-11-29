@@ -2,8 +2,10 @@ package com.upt.cti.smartwallet;
 
 import com.google.firebase.firestore.IgnoreExtraProperties;
 
+import java.io.Serializable;
+
 @IgnoreExtraProperties
-public class Payment {
+public class Payment implements Serializable {
 
     private Integer id;
     private String timestamp;
